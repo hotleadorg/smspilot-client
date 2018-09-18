@@ -178,7 +178,7 @@ class Client
     {
         $response = json_decode($response, true);
         if (!isset($response['error'])) {
-            return Format::response($response);
+            return $response;
         }
         throw new Exception($response['description_ru']);
     }
