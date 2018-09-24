@@ -40,7 +40,7 @@ class Client
             file_get_contents(
                 sprintf(
                     self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s%s&apikey=%s&format=%s',
-                    $request->getText(), $request->getPhone(), $request->getSender(), $this->getApikey(), $format
+                    $request->getText(), $request->getPhone(), $request->getSender(true), $this->getApikey(), $format
                 )
             )
         );
