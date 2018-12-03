@@ -28,6 +28,7 @@ class Client
 
     /**
      * Send SMS (API-1 ОДИНОЧНЫЕ SMS/РАССЫЛКА/СТАТУС/БАЛАНС)
+     * @link https://smspilot.ru/apikey.php#api1
      * @param Request $request
      * @param string $format
      * @return array
@@ -48,6 +49,7 @@ class Client
 
     /**
      * send bulk SMS (API-2 ПАКЕТНАЯ ОТПРАВКИ ПЕРСОНАЛЬНЫХ СООБЩЕНИЙ)
+     * @link https://smspilot.ru/apikey.php#api2
      * @param Request[] $requests
      * @return array
      */
@@ -75,6 +77,7 @@ class Client
 
     /**
      * send hlr (API HLR (ЗАПРОС К БАЗЕ ОПЕРАТОРА))
+     * @link https://smspilot.ru/apikey.php#hlr
      * @param string $phone
      * @param string $callbackUrl
      * @param string $format
@@ -93,6 +96,7 @@ class Client
 
     /**
      * send ping (API PING (СКРЫТОЕ СООБЩЕНИЕ))
+     * @link https://smspilot.ru/apikey.php#ping
      * @param string $phone
      * @param string $format
      * @return array
@@ -110,6 +114,7 @@ class Client
 
     /**
      * send Viber (API VIBER)
+     * @link https://smspilot.ru/apikey.php#viber
      * @param Request $request
      * @param string $format
      * @return array
@@ -127,6 +132,7 @@ class Client
 
     /**
      * Request to register sender (API ИМЕНА ОТПРАВИТЕЛЯ)
+     * @link https://smspilot.ru/apikey.php#sndr
      * @param string $sender
      * @param string $description
      * @param string $callbackUrl
@@ -147,6 +153,7 @@ class Client
 
     /**
      * Get sender list
+     * @link https://smspilot.ru/apikey.php#sndr
      * @param string $format
      * @return array
      */
