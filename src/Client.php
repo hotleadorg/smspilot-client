@@ -167,6 +167,39 @@ class Client
     }
 
     /**
+     * API VOICESMS (ГОЛОСОВЫЕ СООБЩЕНИЯ)
+     * @link https://smspilot.ru/apikey.php#voice
+     * @param Request $request
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function voice($request, $format = self::JSON)
+    {
+        $request = new Request('GOLOS', $request->getPhone(), $request->getText());
+        return $this->send($request, $format);
+    }
+
+    /**
+     * API ANTISPAM-TEMPLATE (АНТИСПАМ-ШАБЛОНЫ)
+     * @link https://smspilot.ru/apikey.php#tpl
+     * @param string $text
+     * @param string $callbackUrl
+     * @param string $format
+     * @return string
+     * @throws SMSPilotException
+     */
+    public function verifyTemplate($text, $callbackUrl, $format = self::JSON)
+    {
+        $requestUrl = self::ROOT_REQUEST_URL . 'api.php?add_template=%s&callback=%s&apikey=%s&format=%s';
+        return $this->asyncResponseProcessing(
+            file_get_contents(
+                sprintf($requestUrl, $text, $callbackUrl, $this->getApikey(), $format)
+            )
+        );
+    }
+
+    /**
      * @param string $response
      * @return array
      * @throws SMSPilotException
