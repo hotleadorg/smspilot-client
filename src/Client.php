@@ -2,7 +2,7 @@
 
 namespace SMSPilot;
 
-use SMSPilot\Exception\Exception;
+use SMSPilot\Exception\SMSPilotException;
 
 class Client
 {
@@ -31,7 +31,7 @@ class Client
      * @param Request $request
      * @param string $format
      * @return array
-     * @throws Exception
+     * @throws SMSPilotException
      */
     public function send($request, $format = self::JSON)
     {
@@ -78,7 +78,7 @@ class Client
      * @param string $callbackUrl
      * @param string $format
      * @return string
-     * @throws Exception
+     * @throws SMSPilotException
      */
     public function hlr($phone, $callbackUrl, $format = self::JSON)
     {
@@ -97,7 +97,7 @@ class Client
      * @param string $phone
      * @param string $format
      * @return array
-     * @throws Exception
+     * @throws SMSPilotException
      */
     public function ping($phone, $format = self::JSON)
     {
@@ -116,7 +116,7 @@ class Client
      * @param Request $request
      * @param string $format
      * @return array
-     * @throws Exception
+     * @throws SMSPilotException
      */
     public function sendViber($request, $format = self::JSON)
     {
@@ -138,7 +138,7 @@ class Client
      * @param bool $isTest
      * @param string $format
      * @return string
-     * @throws Exception
+     * @throws SMSPilotException
      */
     public function registerSenderRequest($sender, $description, $callbackUrl, $isTest = true, $format = self::JSON)
     {
@@ -171,7 +171,7 @@ class Client
     /**
      * @param string $response
      * @return array
-     * @throws Exception
+     * @throws SMSPilotException
      */
     private function syncResponseProcessing($response)
     {
@@ -179,13 +179,13 @@ class Client
         if (!isset($response['error'])) {
             return $response;
         }
-        throw new Exception($response['description_ru']);
+        throw new SMSPilotException($response['description_ru']);
     }
 
     /**
      * @param string $response
      * @return string
-     * @throws Exception
+     * @throws SMSPilotException
      */
     private function asyncResponseProcessing($response)
     {
@@ -193,7 +193,7 @@ class Client
         if (!isset($response['error'])) {
             return "request was send";
         }
-        throw new Exception($response['description_ru']);
+        throw new SMSPilotException($response['description_ru']);
     }
 
     /**
