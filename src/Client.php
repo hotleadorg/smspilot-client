@@ -3,7 +3,6 @@
 namespace SMSPilot;
 
 use SMSPilot\Exception\Exception;
-use SMSPilot\Helper\Format;
 
 class Client
 {
@@ -148,7 +147,7 @@ class Client
                 sprintf(
                     self::ROOT_REQUEST_URL .
                     '/api.php?add_sender=%s&description=%s&callback=%s&test=%s&format=%s&apikey=%s',
-                    $sender, $description, $callbackUrl, Format::bool2int($isTest), $format, $this->getApikey()
+                    $sender, $description, $callbackUrl, (bool)$isTest, $format, $this->getApikey()
                 )
             )
         );
