@@ -35,10 +35,11 @@ class Client
      */
     public function send($request, $format = self::JSON)
     {
+        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s%s&apikey=%s&format=%s';
         return $this->syncResponseProcessing(
             file_get_contents(
                 sprintf(
-                    self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s%s&apikey=%s&format=%s',
+                    $requestUrl,
                     $request->getText(), $request->getPhone(), $request->getSender(true), $this->getApikey(), $format
                 )
             )
@@ -52,7 +53,7 @@ class Client
      */
     public function bulk($requests)
     {
-        $requestUri = self::ROOT_REQUEST_URL . '/api2.php';
+        $requestUrl = self::ROOT_REQUEST_URL . '/api2.php';
         $content = [
             'apikey' => $this->getApiKey(),
             'send' => []
@@ -60,11 +61,11 @@ class Client
         foreach ($requests as $request) {
             $content['send'] = $request->toArray();
         }
-        $response = file_get_contents($requestUri, false,
+        $response = file_get_contents($requestUrl, false,
             stream_context_create([
                 'http' => [
                     'method' => 'POST',
-                    'header' => "Content-Type: application/json\r\n",
+                    'header' => 'Content-Type: application/json\r\n',
                     'content' => json_encode($content),
                 ],
             ])
@@ -82,12 +83,10 @@ class Client
      */
     public function hlr($phone, $callbackUrl, $format = self::JSON)
     {
+        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=HLR&to=%s&callback=%s&format=%s&apikey=%s';
         return $this->asyncResponseProcessing(
             file_get_contents(
-                sprintf(
-                    self::ROOT_REQUEST_URL . '/api.php?send=HLR&to=%s&callback=%s&format=%s&apikey=%s',
-                    $phone, urlencode($callbackUrl), $format, $this->getApikey()
-                )
+                sprintf($requestUrl, $phone, urlencode($callbackUrl), $format, $this->getApikey())
             )
         );
     }
@@ -101,12 +100,10 @@ class Client
      */
     public function ping($phone, $format = self::JSON)
     {
+        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=PING&to=%s&format=%s&apikey=%s';
         return $this->syncResponseProcessing(
             file_get_contents(
-                sprintf(
-                    self::ROOT_REQUEST_URL . "/api.php?send=PING&to=%s&format=%s&apikey=%s",
-                    $phone, $format, $this->getApikey()
-                )
+                sprintf($requestUrl, $phone, $format, $this->getApikey())
             )
         );
     }
@@ -120,12 +117,10 @@ class Client
      */
     public function sendViber($request, $format = self::JSON)
     {
+        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s&from=VIBERSMS&format=%s&apikey=%s';
         return $this->syncResponseProcessing(
             file_get_contents(
-                sprintf(
-                    self::ROOT_REQUEST_URL . "/api.php?send=%s&to=%s&from=VIBERSMS&format=%s&apikey=%s",
-                    $request->getText(), $request->getPhone(), $format, $this->getApikey()
-                )
+                sprintf($requestUrl, $request->getText(), $request->getPhone(), $format, $this->getApikey())
             )
         );
     }
@@ -142,13 +137,10 @@ class Client
      */
     public function registerSenderRequest($sender, $description, $callbackUrl, $isTest = true, $format = self::JSON)
     {
+        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?add_sender=%s&description=%s&callback=%s&test=%s&format=%s&apikey=%s';
         return $this->asyncResponseProcessing(
             file_get_contents(
-                sprintf(
-                    self::ROOT_REQUEST_URL .
-                    '/api.php?add_sender=%s&description=%s&callback=%s&test=%s&format=%s&apikey=%s',
-                    $sender, $description, $callbackUrl, (bool)$isTest, $format, $this->getApikey()
-                )
+                sprintf($requestUrl, $sender, $description, $callbackUrl, (bool)$isTest, $format, $this->getApikey())
             )
         );
     }
@@ -160,10 +152,9 @@ class Client
      */
     public function getSenders($format = self::JSON)
     {
+        $requestUrl = self::ROOT_REQUEST_URL . '?list=senders&format=%s&apikey=%s';
         return json_decode(
-            file_get_contents(
-                sprintf(self::ROOT_REQUEST_URL . '?list=senders&format=%s&apikey=%s', $format, $this->getApiKey())
-            ),
+            file_get_contents(sprintf($requestUrl, $format, $this->getApiKey())),
             true
         )['senders'];
     }
@@ -191,7 +182,7 @@ class Client
     {
         $response = json_decode($response, true);
         if (!isset($response['error'])) {
-            return "request was send";
+            return 'request was send';
         }
         throw new SMSPilotException($response['description_ru']);
     }
