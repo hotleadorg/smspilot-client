@@ -176,7 +176,7 @@ class Client
      */
     public function voice($request, $format = self::JSON)
     {
-        $request = new Request('GOLOS', $request->getPhone(), $request->getText());
+        $request = new Request('GOLOS', urldecode($request->getPhone()), urldecode($request->getText()));
         return $this->send($request, $format);
     }
 
