@@ -120,7 +120,7 @@ class Client
      * @return array
      * @throws SMSPilotException
      */
-    public function sendViber($request, $format = self::JSON)
+    public function viber($request, $format = self::JSON)
     {
         $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s&from=VIBERSMS&format=%s&apikey=%s';
         return $this->syncResponseProcessing(
