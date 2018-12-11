@@ -61,7 +61,7 @@ class Client
             'send' => []
         ];
         foreach ($requests as $request) {
-            $content['send'] = $request->toArray();
+            $content['send'][] = $request->toArray();
         }
         $response = file_get_contents($requestUrl, false,
             stream_context_create([
