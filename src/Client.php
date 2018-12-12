@@ -28,6 +28,19 @@ class Client
 
     /**
      * Send SMS (API-1 ОДИНОЧНЫЕ SMS/РАССЫЛКА/СТАТУС/БАЛАНС)
+     * Response format
+     * {
+     *  'send': [
+     *      [
+     *          'server_id': '123456789'
+     *          'phone':  '79999999999'
+     *          'price': '2.22',
+     *          'status': '0'
+     *      ]
+     *  ],
+     *  'balance': '100.12',
+     *  'cost': '2.22'
+     * }
      * @link https://smspilot.ru/apikey.php#api1
      * @param Request $request
      * @param string $format
@@ -49,6 +62,28 @@ class Client
 
     /**
      * send bulk SMS (API-2 ПАКЕТНАЯ ОТПРАВКИ ПЕРСОНАЛЬНЫХ СООБЩЕНИЙ)
+     * Response format
+     * {
+     *  'send': [
+     *      [
+     *          'id': 0
+     *          'server_id': '123456789',
+     *          'from':  'sender name',
+     *          'to': '79999999999',
+     *          'text': 'hello world!',
+     *          'parts': '1',
+     *          'status': '0',
+     *          'error: '0',
+     *          'send_datetime': '',
+     *          'country': 'RU',
+     *          'operator': 'YOTA',
+     *          'price': '2.22'
+     *      ]
+     *  ],
+     *  'server_packet_id': '987654321',
+     *  'balance': '100.12',
+     *  'cost': '2.22'
+     * }
      * @link https://smspilot.ru/apikey.php#api2
      * @param Request[] $requests
      * @return array
