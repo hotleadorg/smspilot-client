@@ -6,7 +6,9 @@ use SMSPilot\Exception\SMSPilotException;
 
 class Client
 {
-    const ROOT_REQUEST_URL = 'http://smspilot.ru';
+
+    const URL_API_V1 = 'http://smspilot.ru/api.php';
+    const URL_API_V2 = 'http://smspilot.ru/api2.php';
 
     const TEXT = 'text';
     const XML = 'xml';
@@ -24,6 +26,22 @@ class Client
     public function __construct($apiKey)
     {
         $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @param string $url
+     * @param array $params
+     * @return array
+     * @throws SMSPilotException
+     */
+    private function sendViaAPIv1($url, $params)
+    {
+        return (new Processing(
+            Format::getUrlWithParams(
+                $url,
+                $params
+            )
+        ))->sendRequest()->getRequestResult();
     }
 
     /**
@@ -49,15 +67,164 @@ class Client
      */
     public function send($request, $format = self::JSON)
     {
-        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s%s&apikey=%s&format=%s';
-        return $this->syncResponseProcessing(
-            file_get_contents(
-                sprintf(
-                    $requestUrl,
-                    $request->getText(), $request->getPhone(), $request->getSender(true), $this->getApikey(), $format
-                )
-            )
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'send=' . urlencode($request->getText()),
+                'from=' . urlencode($request->getSender()),
+                'to=' . urlencode($request->getPhone()),
+                'send=' . urlencode($request->getText()),
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
         );
+    }
+
+    /**
+     * send hlr (API HLR (ЗАПРОС К БАЗЕ ОПЕРАТОРА))
+     * @link https://smspilot.ru/apikey.php#hlr
+     * @param string $phone
+     * @param string $callbackUrl
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function hlr($phone, $callbackUrl, $format = self::JSON)
+    {
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'send=HLR',
+                'from=' . urlencode($phone),
+                'callback=' . urlencode($callbackUrl),
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
+        );
+    }
+
+    /**
+     * send ping (API PING (СКРЫТОЕ СООБЩЕНИЕ))
+     * @link https://smspilot.ru/apikey.php#ping
+     * @param string $phone
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function ping($phone, $format = self::JSON)
+    {
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'send=PING',
+                'to=' . urlencode($phone),
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
+        );
+    }
+
+    /**
+     * send Viber (API VIBER)
+     * @link https://smspilot.ru/apikey.php#viber
+     * @param Request $request
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function viber($request, $format = self::JSON)
+    {
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'send=' . $request->getText(),
+                'to=' . urlencode($request->getPhone()),
+                'from=VIBERSMS',
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
+        );
+    }
+
+    /**
+     * Request to register sender (API ИМЕНА ОТПРАВИТЕЛЯ)
+     * @link https://smspilot.ru/apikey.php#sndr
+     * @param string $sender
+     * @param string $description
+     * @param string $callbackUrl
+     * @param bool $isTest
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function registerSenderRequest($sender, $description, $callbackUrl, $isTest = true, $format = self::JSON)
+    {
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'add_sender=' . $sender,
+                'description=' . urlencode($description),
+                'callback=' . urlencode($callbackUrl),
+                'test=' . (bool)$isTest,
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
+        );
+    }
+
+    /**
+     * Get sender list
+     * @link https://smspilot.ru/apikey.php#sndr
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function getSenders($format = self::JSON)
+    {
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'list=senders',
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
+        )['senders'];
+    }
+
+    /**
+     * API ANTISPAM-TEMPLATE (АНТИСПАМ-ШАБЛОНЫ)
+     * @link https://smspilot.ru/apikey.php#tpl
+     * @param string $text
+     * @param string $callbackUrl
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function verifyTemplate($text, $callbackUrl, $format = self::JSON)
+    {
+        return $this->sendViaAPIv1(
+            self::URL_API_V1,
+            [
+                'add_template=' . urlencode($text),
+                'callback=' . urlencode($callbackUrl),
+                'apikey=' . $this->getApikey(),
+                'format=' . $format,
+            ]
+        );
+    }
+
+    /**
+     * API VOICESMS (ГОЛОСОВЫЕ СООБЩЕНИЯ)
+     * @link https://smspilot.ru/apikey.php#voice
+     * @param Request $request
+     * @param string $format
+     * @return array
+     * @throws SMSPilotException
+     */
+    public function voice($request, $format = self::JSON)
+    {
+        $request = new Request('GOLOS', $request->getPhone(), $request->getText());
+        return $this->send($request, $format);
     }
 
     /**
@@ -90,7 +257,6 @@ class Client
      */
     public function bulk($requests)
     {
-        $requestUrl = self::ROOT_REQUEST_URL . '/api2.php';
         $content = [
             'apikey' => $this->getApiKey(),
             'send' => []
@@ -98,7 +264,9 @@ class Client
         foreach ($requests as $request) {
             $content['send'][] = $request->toArray();
         }
-        $response = file_get_contents($requestUrl, false,
+        $response = file_get_contents(
+            self::URL_API_V2,
+            false,
             stream_context_create([
                 'http' => [
                     'method' => 'POST',
@@ -108,158 +276,6 @@ class Client
             ])
         );
         return json_decode($response, true);
-    }
-
-    /**
-     * send hlr (API HLR (ЗАПРОС К БАЗЕ ОПЕРАТОРА))
-     * @link https://smspilot.ru/apikey.php#hlr
-     * @param string $phone
-     * @param string $callbackUrl
-     * @param string $format
-     * @return string
-     * @throws SMSPilotException
-     */
-    public function hlr($phone, $callbackUrl, $format = self::JSON)
-    {
-        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=HLR&to=%s&callback=%s&format=%s&apikey=%s';
-        return $this->asyncResponseProcessing(
-            file_get_contents(
-                sprintf($requestUrl, $phone, urlencode($callbackUrl), $format, $this->getApikey())
-            )
-        );
-    }
-
-    /**
-     * send ping (API PING (СКРЫТОЕ СООБЩЕНИЕ))
-     * @link https://smspilot.ru/apikey.php#ping
-     * @param string $phone
-     * @param string $format
-     * @return array
-     * @throws SMSPilotException
-     */
-    public function ping($phone, $format = self::JSON)
-    {
-        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=PING&to=%s&format=%s&apikey=%s';
-        return $this->syncResponseProcessing(
-            file_get_contents(
-                sprintf($requestUrl, $phone, $format, $this->getApikey())
-            )
-        );
-    }
-
-    /**
-     * send Viber (API VIBER)
-     * @link https://smspilot.ru/apikey.php#viber
-     * @param Request $request
-     * @param string $format
-     * @return array
-     * @throws SMSPilotException
-     */
-    public function viber($request, $format = self::JSON)
-    {
-        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?send=%s&to=%s&from=VIBERSMS&format=%s&apikey=%s';
-        return $this->syncResponseProcessing(
-            file_get_contents(
-                sprintf($requestUrl, $request->getText(), $request->getPhone(), $format, $this->getApikey())
-            )
-        );
-    }
-
-    /**
-     * Request to register sender (API ИМЕНА ОТПРАВИТЕЛЯ)
-     * @link https://smspilot.ru/apikey.php#sndr
-     * @param string $sender
-     * @param string $description
-     * @param string $callbackUrl
-     * @param bool $isTest
-     * @param string $format
-     * @return string
-     * @throws SMSPilotException
-     */
-    public function registerSenderRequest($sender, $description, $callbackUrl, $isTest = true, $format = self::JSON)
-    {
-        $requestUrl = self::ROOT_REQUEST_URL . '/api.php?add_sender=%s&description=%s&callback=%s&test=%s&format=%s&apikey=%s';
-        return $this->asyncResponseProcessing(
-            file_get_contents(
-                sprintf($requestUrl, $sender, $description, $callbackUrl, (bool)$isTest, $format, $this->getApikey())
-            )
-        );
-    }
-
-    /**
-     * Get sender list
-     * @link https://smspilot.ru/apikey.php#sndr
-     * @param string $format
-     * @return array
-     */
-    public function getSenders($format = self::JSON)
-    {
-        $requestUrl = self::ROOT_REQUEST_URL . '?list=senders&format=%s&apikey=%s';
-        return json_decode(
-            file_get_contents(sprintf($requestUrl, $format, $this->getApiKey())),
-            true
-        )['senders'];
-    }
-
-    /**
-     * API VOICESMS (ГОЛОСОВЫЕ СООБЩЕНИЯ)
-     * @link https://smspilot.ru/apikey.php#voice
-     * @param Request $request
-     * @param string $format
-     * @return array
-     * @throws SMSPilotException
-     */
-    public function voice($request, $format = self::JSON)
-    {
-        $request = new Request('GOLOS', urldecode($request->getPhone()), urldecode($request->getText()));
-        return $this->send($request, $format);
-    }
-
-    /**
-     * API ANTISPAM-TEMPLATE (АНТИСПАМ-ШАБЛОНЫ)
-     * @link https://smspilot.ru/apikey.php#tpl
-     * @param string $text
-     * @param string $callbackUrl
-     * @param string $format
-     * @return string
-     * @throws SMSPilotException
-     */
-    public function verifyTemplate($text, $callbackUrl, $format = self::JSON)
-    {
-        $requestUrl = self::ROOT_REQUEST_URL . 'api.php?add_template=%s&callback=%s&apikey=%s&format=%s';
-        return $this->asyncResponseProcessing(
-            file_get_contents(
-                sprintf($requestUrl, $text, $callbackUrl, $this->getApikey(), $format)
-            )
-        );
-    }
-
-    /**
-     * @param string $response
-     * @return array
-     * @throws SMSPilotException
-     */
-    private function syncResponseProcessing($response)
-    {
-        $response = json_decode($response, true);
-        if (!isset($response['error'])) {
-            return $response;
-        }
-        throw new SMSPilotException($response['description_ru']);
-    }
-
-    /**
-     * @param string $response
-     * @return string
-     * @throws SMSPilotException
-     */
-    private function asyncResponseProcessing($response)
-    {
-        $response = json_decode($response, true);
-        if (!isset($response['error'])) {
-            return 'request was send';
-        }
-        throw new SMSPilotException($response['description_ru']);
     }
 
     /**

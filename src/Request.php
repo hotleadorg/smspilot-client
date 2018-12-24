@@ -35,16 +35,15 @@ class Request
      */
     public function getPhone()
     {
-        return urlencode($this->phone);
+        return $this->phone;
     }
 
     /**
-     * @param bool $format
      * @return string
      */
-    public function getSender($format = false)
+    public function getSender()
     {
-        return $format === false ? $this->sender : sprintf("&from=%s", $this->sender);
+        return $this->sender;
     }
 
     /**
@@ -52,7 +51,7 @@ class Request
      */
     public function getText()
     {
-        return urlencode($this->text);
+        return $this->text;
     }
 
     public function toArray()
