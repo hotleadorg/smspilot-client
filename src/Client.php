@@ -70,12 +70,11 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'send=' . urlencode($request->getText()),
-                'from=' . urlencode($request->getSender()),
-                'to=' . urlencode($request->getPhone()),
-                'send=' . urlencode($request->getText()),
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'send' => urlencode($request->getText()),
+                'from' => urlencode($request->getSender()),
+                'to' => urlencode($request->getPhone()),
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         );
     }
@@ -94,11 +93,11 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'send=HLR',
-                'from=' . urlencode($phone),
-                'callback=' . urlencode($callbackUrl),
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'send' => 'HLR',
+                'from' => urlencode($phone),
+                'callback' => urlencode($callbackUrl),
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         );
     }
@@ -116,10 +115,10 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'send=PING',
-                'to=' . urlencode($phone),
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'send' => 'PING',
+                'to' => urlencode($phone),
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         );
     }
@@ -137,11 +136,11 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'send=' . $request->getText(),
-                'to=' . urlencode($request->getPhone()),
-                'from=VIBERSMS',
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'send' => $request->getText(),
+                'to' => urlencode($request->getPhone()),
+                'from' => 'VIBERSMS',
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         );
     }
@@ -162,12 +161,12 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'add_sender=' . $sender,
-                'description=' . urlencode($description),
-                'callback=' . urlencode($callbackUrl),
-                'test=' . (bool)$isTest,
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'add_sender' => $sender,
+                'description' => urlencode($description),
+                'callback' => urlencode($callbackUrl),
+                'test' => (bool)$isTest,
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         );
     }
@@ -185,8 +184,8 @@ class Client
             self::URL_API_V1,
             [
                 'list=senders',
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         )['senders'];
     }
@@ -205,10 +204,10 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'add_template=' . urlencode($text),
-                'callback=' . urlencode($callbackUrl),
-                'apikey=' . $this->getApikey(),
-                'format=' . $format,
+                'add_template' => urlencode($text),
+                'callback' => urlencode($callbackUrl),
+                'apikey' => $this->getApikey(),
+                'format' => $format,
             ]
         );
     }

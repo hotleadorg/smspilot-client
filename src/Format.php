@@ -12,6 +12,6 @@ class Format
      */
     public static function getUrlWithParams($url, $params)
     {
-        return sprintf('%s?%s', $url, implode('&', $params));
+        return sprintf('%s?%s', $url, http_build_query($params));
     }
 }
