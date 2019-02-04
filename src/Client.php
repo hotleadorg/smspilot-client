@@ -70,9 +70,9 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'send' => urlencode($request->getText()),
-                'from' => urlencode($request->getSender()),
-                'to' => urlencode($request->getPhone()),
+                'send' => $request->getText(),
+                'from' => $request->getSender(),
+                'to' => $request->getPhone(),
                 'apikey' => $this->getApikey(),
                 'format' => $format,
             ]
@@ -94,8 +94,8 @@ class Client
             self::URL_API_V1,
             [
                 'send' => 'HLR',
-                'from' => urlencode($phone),
-                'callback' => urlencode($callbackUrl),
+                'from' => $phone,
+                'callback' => $callbackUrl,
                 'apikey' => $this->getApikey(),
                 'format' => $format,
             ]
@@ -116,7 +116,7 @@ class Client
             self::URL_API_V1,
             [
                 'send' => 'PING',
-                'to' => urlencode($phone),
+                'to' => $phone,
                 'apikey' => $this->getApikey(),
                 'format' => $format,
             ]
@@ -137,7 +137,7 @@ class Client
             self::URL_API_V1,
             [
                 'send' => $request->getText(),
-                'to' => urlencode($request->getPhone()),
+                'to' => $request->getPhone(),
                 'from' => 'VIBERSMS',
                 'apikey' => $this->getApikey(),
                 'format' => $format,
@@ -162,8 +162,8 @@ class Client
             self::URL_API_V1,
             [
                 'add_sender' => $sender,
-                'description' => urlencode($description),
-                'callback' => urlencode($callbackUrl),
+                'description' => $description,
+                'callback' => $callbackUrl,
                 'test' => (bool)$isTest,
                 'apikey' => $this->getApikey(),
                 'format' => $format,
@@ -204,8 +204,8 @@ class Client
         return $this->sendViaAPIv1(
             self::URL_API_V1,
             [
-                'add_template' => urlencode($text),
-                'callback' => urlencode($callbackUrl),
+                'add_template' => $text,
+                'callback' => $callbackUrl,
                 'apikey' => $this->getApikey(),
                 'format' => $format,
             ]
