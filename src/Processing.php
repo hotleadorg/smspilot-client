@@ -8,15 +8,21 @@ class Processing
 {
 
     private $url;
+    private $useIncludePath;
+    private $context;
     /** @var string $response */
     private $response;
 
     /**
      * @param string $url
+     * @param bool $useIncludePath
+     * @param null|resource $context
      */
-    public function __construct($url)
+    public function __construct($url, $useIncludePath = false, $context = null)
     {
         $this->url = $url;
+        $this->useIncludePath = $useIncludePath;
+        $this->context = $context;
     }
 
     /**
@@ -24,7 +30,7 @@ class Processing
      */
     public function sendRequest()
     {
-        $this->response = file_get_contents($this->url);
+        $this->response = file_get_contents($this->url, $this->useIncludePath, $this->context);
         return $this;
     }
 
@@ -38,12 +44,6 @@ class Processing
         if (!isset($response['error'])) {
             return $response;
         }
-        throw new SMSPilotException(json_encode([
-            'code' => $response['error'],
-            'reason' => [
-                'en' => $response['description_en'],
-                'ru' => $response['description_ru'],
-            ]
-        ]));
+        throw new SMSPilotException($response['error']['code']);
     }
 }

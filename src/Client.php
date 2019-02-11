@@ -253,6 +253,7 @@ class Client
      * @link https://smspilot.ru/apikey.php#api2
      * @param Request[] $requests
      * @return array
+     * @throws SMSPilotException
      */
     public function bulk($requests)
     {
@@ -263,18 +264,13 @@ class Client
         foreach ($requests as $request) {
             $content['send'][] = $request->toArray();
         }
-        $response = file_get_contents(
-            self::URL_API_V2,
-            false,
-            stream_context_create([
-                'http' => [
-                    'method' => 'POST',
-                    'header' => 'Content-Type: application/json\r\n',
-                    'content' => json_encode($content),
-                ],
-            ])
-        );
-        return json_decode($response, true);
+        return (new Processing(self::URL_API_V2, false, stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json\r\n',
+                'content' => json_encode($content),
+            ],
+        ])))->sendRequest()->getRequestResult();
     }
 
     /**
